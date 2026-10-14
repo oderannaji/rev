@@ -52,9 +52,9 @@ shepherd_whisper="$shepherd_tools/whisper.cpp-v1.7.6"
 if [[ ! -d "$shepherd_whisper" ]]; then
   git clone --depth 1 --branch v1.7.6 https://github.com/ggml-org/whisper.cpp.git "$shepherd_whisper"
 fi
-if [[ ! -x "$shepherd_whisper/build/bin/whisper-cli" ]]; then
+if [[ ! -x "$shepherd_whisper/build/bin/whisper-cli" || ! -x "$shepherd_whisper/build/bin/whisper-server" ]]; then
   cmake -S "$shepherd_whisper" -B "$shepherd_whisper/build" -DCMAKE_BUILD_TYPE=Release -DGGML_METAL=ON
-  cmake --build "$shepherd_whisper/build" --config Release -j 4 --target whisper-cli
+  cmake --build "$shepherd_whisper/build" --config Release -j 4 --target whisper-cli whisper-server whisper-server
 fi
 shepherd_model="$shepherd_whisper/models/ggml-small.bin"
 if [[ ! -s "$shepherd_model" ]]; then

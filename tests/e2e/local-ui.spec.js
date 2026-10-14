@@ -22,7 +22,7 @@ test('local model settings and Context mode explain missing setup',async({page})
   await expect(page.getByLabel('Local drafting model')).toHaveValue('qwen3:4b');
   await expect(page.getByRole('button',{name:'Copy OBS lower-third URL'})).toBeVisible();
   await page.getByRole('button',{name:'Transcripts',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Use offline microphone'})).toBeDisabled();
+  await expect(page.getByRole('button',{name:'Start live listening'})).toBeDisabled();
   await expect(page.getByText(/Configure local Whisper in Settings/)).toBeVisible();
 });
 test('microphone worklet produces valid local PCM WAV and appends returned transcript',async({page,context})=>{
@@ -31,6 +31,7 @@ test('microphone worklet produces valid local PCM WAV and appends returned trans
   let seconds=0;
   await page.route('**/api/speech/transcribe',async route=>{const input=route.request().postDataJSON();seconds=validateWav(Buffer.from(input.audio,'base64')).seconds;await route.fulfill({json:{text:'We read John chapter three verse sixteen.',language:'en'}});});
   await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await page.getByLabel('Transcription mode').selectOption('batch');
   await page.getByRole('button',{name:'Use offline microphone'}).click();
   await expect(page.getByRole('button',{name:'Stop recording'})).toBeVisible();
   // Give the synthetic microphone enough real audio time for a valid chunk.
@@ -45,7 +46,7 @@ test('input level test works without Whisper, selects a device, and sends no aud
   await page.route('**/api/speech/transcribe',route=>{transcriptionRequests++;return route.fulfill({json:{text:'Unexpected transcription'}});});
   await page.evaluate(()=>{const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);navigator.mediaDevices.getUserMedia=constraints=>{window.lastAudioConstraints=constraints;return original(constraints);};});
   await page.getByRole('button',{name:'Transcripts',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Use offline microphone'})).toBeDisabled();
+  await expect(page.getByRole('button',{name:'Start live listening'})).toBeDisabled();
   await expect.poll(()=>page.getByLabel('Audio input',{exact:true}).locator('option').count()).toBeGreaterThan(1);
   const chosen=await page.getByLabel('Audio input',{exact:true}).locator('option').nth(1).getAttribute('value');
   await page.getByLabel('Audio input',{exact:true}).selectOption(chosen);
@@ -57,4 +58,19 @@ test('input level test works without Whisper, selects a device, and sends no aud
   await expect(page.getByLabel('Microphone input level')).toHaveAttribute('value','0');
   await expect(page.getByLabel('Audio input',{exact:true})).toBeEnabled();
   await expect(page.getByLabel('Transcript text')).toHaveValue('');expect(transcriptionRequests).toBe(0);
+});
+test('continuous mode displays a draft before Stop and commits the final phrase',async({page,context})=>{
+  await context.grantPermissions(['microphone']);
+  await page.route('**/api/speech/status',route=>route.fulfill({json:{available:true,liveAvailable:true}}));
+  await page.route('**/api/speech/prepare',route=>route.fulfill({json:{ready:true}}));
+  let requests=0;
+  await page.route('**/api/speech/transcribe',route=>{const data=route.request().postDataJSON();expect(data.live).toBe(true);requests++;return route.fulfill({json:{text:'We are reading John chapter three verse sixteen.',inferenceMs:100}});});
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await page.getByRole('button',{name:'Start live listening'}).click();
+  await expect(page.getByLabel('Live transcript draft')).toContainText('John chapter three');
+  await expect(page.getByRole('button',{name:'Stop recording'})).toBeVisible();
+  await expect(page.getByLabel('Transcript text')).toHaveValue('');
+  await page.getByRole('button',{name:'Stop recording'}).click();
+  await expect(page.getByLabel('Transcript text')).toContainText('John chapter three');
+  await expect(page.getByLabel('Live transcript draft')).toHaveCount(0);expect(requests).toBeGreaterThanOrEqual(2);
 });
