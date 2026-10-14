@@ -68,6 +68,7 @@ test('continuous mode displays a draft before Stop and commits the final phrase'
   await page.getByRole('button',{name:'Transcripts',exact:true}).click();
   await page.getByRole('button',{name:'Start live listening'}).click();
   await expect(page.getByLabel('Live transcript draft')).toContainText('John chapter three');
+  await expect(page.getByRole('button',{name:'Preview detected John 3:16',exact:true})).toBeVisible();
   await expect(page.getByRole('button',{name:'Stop recording'})).toBeVisible();
   await expect(page.getByLabel('Transcript text')).toHaveValue('');
   await page.getByRole('button',{name:'Stop recording'}).click();
