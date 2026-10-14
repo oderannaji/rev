@@ -52,6 +52,8 @@ export async function createServer({root=projectRoot,dataDir=process.env.DATA_DI
     return json(await localConfig.save(await body(req,10000)));
    }
    if(req.method==='POST'&&path==='/api/local-ai/index'){const input=await body(req,1000);return json(await semantic.build(input.translation||'BSB'),202);}
+   if(req.method==='POST'&&path==='/api/speech/prepare'){await body(req,1000);await speech.prepare();return json({ready:true});}
+   if(req.method==='POST'&&path==='/api/speech/prepare'){await body(req,1000);await speech.prepare();return json({ready:true});}
    if(req.method==='GET'&&path==='/api/speech/status')return json(await speech.status());
    if(req.method==='POST'&&path==='/api/speech/transcribe')return json(await speech.transcribe(await body(req,5700000)));
    if(req.method==='GET'&&path==='/api/content/status'){
@@ -101,9 +103,9 @@ export async function createServer({root=projectRoot,dataDir=process.env.DATA_DI
    res.writeHead(200,{...headers,'Content-Type':mime[extname(file)]??'application/octet-stream','Content-Length':data.length});res.end(req.method==='HEAD'?undefined:data);
   }catch(e){if(!res.headersSent)json({error:e.status?e.message:'Internal server error'},e.status??500);else res.end();if(!e.status)console.error('Request failed:',e.message);}
  });
- server.on('close',()=>{semantic.stop();for(const listener of listeners)listener.end();listeners.clear();});
- server.engine=engine;return server;
+ server.on('close',()=>{semantic.stop();speech.stop();speech.stop();for(const listener of listeners)listener.end();listeners.clear();});
+ server.engine=engine;server.stopServices=()=>{semantic.stop();speech.stop();};return server;
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- const server=await createServer();server.listen(Number(process.env.PORT??4173),'127.0.0.1',()=>{const port=server.address().port;console.log(`Shepherd Pro ready at http://127.0.0.1:${port}`);process.send?.({type:'ready',port});});
+ const server=await createServer();for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>{server.stopServices();server.closeAllConnections();server.close(()=>process.exit(0));});server.listen(Number(process.env.PORT??4173),'127.0.0.1',()=>{const port=server.address().port;console.log(`Shepherd Pro ready at http://127.0.0.1:${port}`);process.send?.({type:'ready',port});});
 }
