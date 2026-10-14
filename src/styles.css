@@ -12,3 +12,5 @@ html[data-output="lowerthird"],html[data-output="lowerthird"] body,html[data-out
 .mic-test{border:1px solid var(--line);border-radius:8px;padding:14px;margin:4px 0 16px}.mic-test>strong{font-size:12px}.mic-test meter{display:block;width:100%;height:14px;margin-top:12px;accent-color:var(--green)}.mic-test label{margin:12px 0}.mic-test .button-row{margin-top:12px}
 
 .live-transcript-draft{padding:14px;border-left:3px solid var(--green);background:#22301c;margin:12px 0}.live-transcript-draft p{font-size:14px;line-height:1.7;color:var(--green)}
+
+.live-scripture{border-top:1px solid var(--line);padding-top:18px;margin:14px 0}.live-scripture>.section-label{display:flex;align-items:center;gap:8px;margin-bottom:12px}.live-scripture .checkbox-label{font-size:11px;line-height:1.6;margin:10px 0}.live-scripture .verse-card{margin:10px 0}

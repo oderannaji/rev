@@ -2,6 +2,7 @@ import http from 'node:http';
 import {createLocalConfig,createOllama} from './local-ai.js';
 import {createSemantic} from './semantic.js';
 import {createSpeech} from './speech.js';
+import {createDetector} from './detection.js';
 import {validateState} from '../shared/state.js';
 import {readFile,writeFile,mkdir,readdir,rename,stat} from 'node:fs/promises';
 import {resolve,join,extname,dirname,sep} from 'node:path';
@@ -28,6 +29,7 @@ export async function createServer({root=projectRoot,dataDir=process.env.DATA_DI
  for(const file of await readdir(join(dataDir,'translations')))if(file.endsWith('.json')){try{const data=validateTranslation(JSON.parse(await readFile(join(dataDir,'translations',file),'utf8')));if(!engine.list().some(x=>x.id===data.id))engine.addTranslation(data);}catch{console.warn(`Ignored invalid local translation file: ${file}`);}}
  const localConfig=await createLocalConfig(dataDir),ollama=createOllamaOverride||createOllama();
  const semantic=createSemantic({dataDir,engine,config:localConfig,ollama}),speech=createSpeech({config:localConfig,...(speechExecute?{execute:speechExecute}:{})});
+ const detector=createDetector({engine,semantic});
  let state={};try{const loaded=JSON.parse(await readFile(join(dataDir,'state.json'),'utf8'));state=validateState(loaded);}catch(e){if(e.code!=='ENOENT')console.warn('Local state could not be loaded; starting with an empty state');}
  const listeners=new Set();let writeQueue=Promise.resolve();
  const broadcast=()=>{for(const response of listeners)response.write(`data: ${JSON.stringify(state)}\n\n`);};
@@ -61,6 +63,7 @@ export async function createServer({root=projectRoot,dataDir=process.env.DATA_DI
     try{await ollama.installed(c.draftModel);return json({configured:true,local:true,model:c.draftModel});}catch(e){return json({configured:false,local:true,model:c.draftModel,error:e.message});}
    }
    if(req.method==='POST'&&path==='/api/content/generate')return json(await generateContent(await body(req,100000),process.env,{config:localConfig.get(),ollama}));
+   if(req.method==='POST'&&path==='/api/scripture/detect')return json(await detector.detect(await body(req,12000)));
    if(req.method==='GET'&&path==='/api/translations')return json(engine.list());
    if(req.method==='POST'&&path==='/api/translations'){
     const translation=validateTranslation(await body(req,30*1024*1024));if(engine.list().some(t=>t.id===translation.id))throw fail('That translation ID already exists',409);

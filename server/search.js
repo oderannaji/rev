@@ -44,6 +44,23 @@ export function createSearchEngine(translations=[]) {
   if(chapter<1||(start!==null&&(start<1||end<start||end>200)))return null;
   return {book,chapter,start,end};
  }
+ function findReferences(text,translation='BSB'){
+  const lib=get(translation);
+  // Alias keys are normalized to letters, digits and spaces only.
+  const books=[...lib.aliases.keys()].sort((a,b)=>b.length-a.length).map(x=>x.replace(/ /g,'\\s*')).join('|');
+  // In "John three sixteen", three and sixteen are separate numbers; in
+  // "Psalm twenty three", twenty three is one. Scope this grammar to books.
+  const numberWords=Object.keys(small).filter(x=>!['first','second','third'].includes(x)).join('|');
+  const phrasePattern=new RegExp('\\b('+books+')\\s+((?:'+numberWords+'|hundred)(?:\\s+(?:'+numberWords+'|hundred))+)(?![a-z])','gi');
+  const raw=String(text).slice(-1500).toLowerCase().replace(/\b(first|second|third)\s+(?=(?:samuel|kings|chronicles|corinthians|thessalonians|timothy|peter|john)\b)/g,word=>({first:'1 ',second:'2 ',third:'3 '}[word.trim()]));
+  const q=spokenNumbers(raw.replace(phrasePattern,(_,book,phrase)=>{
+    const parts=phrase.split(/\s+/),numbers=[];
+    while(parts.length){let value=small[parts.shift()]||0;if(parts[0]==='hundred'){parts.shift();value=Math.max(1,value)*100;if(parts.length)value+=small[parts.shift()]||0;}if(value%100>=20&&value%10===0&&small[parts[0]]>0&&small[parts[0]]<10)value+=small[parts.shift()];numbers.push(value);}
+    return book+' '+numbers.join(' ');
+  }));
+  const pattern=new RegExp('\\b('+books+')[\\s,]*(?:chapter\\s*)?(\\d{1,3})(?:[\\s,]*(?::|verses?\\s*|\\s)(\\d{1,3})(?:\\s*(?:-|through|thru|to|and)\\s*(\\d{1,3}))?)?\\b','gi');
+  return [...q.matchAll(pattern)].map(m=>({book:lib.aliases.get(normalize(m[1])),chapter:Number(m[2]),start:m[3]?Number(m[3]):null,end:m[4]?Number(m[4]):m[3]?Number(m[3]):null,position:m.index,after:q.slice(m.index+m[0].length),source:q})).filter(r=>r.chapter>0&&(r.start===null||r.start>0&&r.end>=r.start&&r.end<=200));
+ }
  const clean=(v,score=1,reason='Reference match')=>{const {_normal,_length,...rest}=v;return {...rest,score:Number(score.toFixed(4)),reason};};
  function chapter(book,chapterNumber,translation='BSB'){const lib=get(translation);const name=lib.aliases.get(normalize(book));return (lib.books.get(name)??[]).map(i=>lib.rows[i]).filter(v=>v.chapter===Number(chapterNumber)).map(v=>clean(v));}
  function search(query,{mode='smart',translation='BSB',limit=50}={}){
@@ -62,5 +79,5 @@ export function createSearchEngine(translations=[]) {
   const reason=mode==='concept'?`Concept expansion${expanded.length?`: ${[...new Set(expanded)].join(', ')}`:' (no synonyms available)'}`:fixes.length?`Keyword match; spelling: ${fixes.join('; ')}`:'Keyword match';
   return finish(rows.map(({v,score})=>clean(v,score,reason)),mode==='concept'?'Local keyword + synonym expansion (not neural semantic search)':'Local keyword ranking with typo tolerance');
  }
- return {addTranslation,search,chapter,parseReference,rows:(id)=>get(id).rows.map(v=>clean(v)),list:()=>[...libraries.values()].map(({id,name,rows})=>({id,name,count:rows.length}))};
+ return {addTranslation,search,chapter,parseReference,findReferences,spokenNumbers,rows:(id)=>get(id).rows.map(v=>clean(v)),list:()=>[...libraries.values()].map(({id,name,rows})=>({id,name,count:rows.length}))};
 }
