@@ -1,0 +1,32 @@
+import React,{useEffect,useRef,useState} from 'react';
+import {Mic,Upload,RefreshCw} from 'lucide-react';
+import {captureMicrophone,audioFile} from './audio.js';
+export default function OfflineSpeech({onText,fail}){
+  const [status,setStatus]=useState(null),[recording,setRecording]=useState(false),[pending,setPending]=useState(0),[starting,setStarting]=useState(false),[message,setMessage]=useState('');
+  const [testing,setTesting]=useState(false),[devices,setDevices]=useState([]),[deviceId,setDeviceId]=useState(''),[level,setLevel]=useState(0),[heard,setHeard]=useState(false);
+  const stopRef=useRef(),queue=useRef([]),working=useRef(false),active=useRef(true),callback=useRef(onText),file=useRef();callback.current=onText;
+  const refreshStatus=async()=>{try{const r=await fetch('/api/speech/status');if(!r.ok)throw Error('Could not check local Whisper.');const s=await r.json();if(active.current)setStatus(s);}catch(e){if(active.current)fail(e);}};
+  const refreshDevices=async()=>{try{const inputs=(await navigator.mediaDevices?.enumerateDevices()||[]).filter(d=>d.kind==='audioinput');if(active.current){setDevices(inputs);setDeviceId(current=>inputs.some(d=>d.deviceId===current)?current:'');}}catch(e){if(active.current)fail(e);}};
+  useEffect(()=>{active.current=true;refreshStatus();refreshDevices();navigator.mediaDevices?.addEventListener('devicechange',refreshDevices);return()=>{active.current=false;queue.current=[];navigator.mediaDevices?.removeEventListener('devicechange',refreshDevices);void stopRef.current?.(false);};},[]);
+  const onLevel=value=>{if(active.current){setLevel(Math.min(100,Math.round(value*600)));if(value>.002)setHeard(true);}};
+  const disconnected=e=>{if(active.current){fail(e);setRecording(false);setTesting(false);}};
+  const drain=async()=>{
+    if(working.current)return;working.current=true;
+    try{while(queue.current.length&&active.current){const audio=queue.current.shift();setPending(queue.current.length+1);
+      const r=await fetch('/api/speech/transcribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio})}),data=await r.json();if(!r.ok)throw Error(data.error);
+      if(active.current){if(data.text)callback.current(data.text);setMessage(data.silent?'Quiet audio skipped.':'Transcribed locally. Review names and scripture references.');}
+    }}catch(e){if(active.current){fail(e);setRecording(false);await stopRef.current?.(false);}queue.current=[];}finally{working.current=false;if(active.current)setPending(0);}
+  };
+  const enqueue=audio=>{if(!active.current)return;queue.current.push(audio);setPending(queue.current.length+(working.current?1:0));if(queue.current.length>=3){setRecording(false);setMessage('Capture paused so local transcription can catch up. Remaining captured audio will finish processing.');void stopRef.current?.(false);}void drain();};
+  const toggle=async()=>{if(recording){setRecording(false);await stopRef.current?.();return;}setStarting(true);setHeard(false);try{const stop=await captureMicrophone(enqueue,disconnected,{deviceId,onLevel});if(!active.current){await stop(false);return;}stopRef.current=stop;setRecording(true);await refreshDevices();setMessage('Recording locally in 20-second sections. Stop to transcribe the final section.');}catch(e){fail(e);}finally{if(active.current)setStarting(false);}};
+  const testInput=async()=>{if(testing){setTesting(false);await stopRef.current?.(false);return;}setStarting(true);setHeard(false);setMessage('');try{const stop=await captureMicrophone(()=>{},disconnected,{deviceId,onLevel,collect:false});if(!active.current){await stop(false);return;}stopRef.current=stop;setTesting(true);await refreshDevices();}catch(e){fail(e);}finally{if(active.current)setStarting(false);}};
+  return <div className="offline-speech"><div className="mic-test"><strong>Try your Mac’s microphone</strong><p className="muted">No mixer or external microphone is needed. First check the level, then stop the test and start transcription.</p>
+    <label>Audio input<select aria-label="Audio input" value={deviceId} disabled={testing||recording||starting} onChange={e=>setDeviceId(e.target.value)}><option value="">System default microphone</option>{devices.filter(d=>d.deviceId&&d.deviceId!=='default').map((d,i)=><option key={d.deviceId} value={d.deviceId}>{d.label||`Microphone ${i+1}`}</option>)}</select></label>
+    <div className="button-row"><button className="button" disabled={recording||starting||pending>0||!navigator.mediaDevices?.getUserMedia} onClick={testInput}><Mic size={14}/>{testing?'Stop microphone test':'Test microphone level'}</button><button className="button small" disabled={starting} onClick={()=>{void refreshStatus();void refreshDevices();}}><RefreshCw size={13}/>Refresh audio setup</button></div>
+    <meter aria-label="Microphone input level" min="0" max="100" value={level}/><p className="muted" role="status">{testing||recording?heard?'Audio is reaching the app.':'Speak toward your Mac and watch the level.':heard?'Audio input checked. Transcription is a separate test.':'The level test works without Whisper and does not save or transcribe audio.'}</p>
+  </div><div className="button-row"><button className={`button ${recording?'recording':''}`} disabled={!status?.available||starting||testing||(!recording&&pending>0)} onClick={toggle}><Mic size={15}/>{starting?'Opening microphone…':recording?'Stop recording':'Use offline microphone'}</button><button className="button" disabled={!status?.available||recording||testing||starting||pending>0} onClick={()=>file.current.click()}><Upload size={14}/>Transcribe audio file</button><input ref={file} hidden type="file" accept="audio/*" onChange={async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{enqueue(await audioFile(f));}catch(error){fail(error);}}}/></div>
+    <p className="muted">{!status?'Checking local Whisper…':!status.available?'Configure local Whisper in Settings to use offline transcription. You can still type or paste notes.':'English · Audio is processed on this computer.'}</p>
+    <p className="muted">Try saying: “Today we are reading John chapter three, verse sixteen.” Click Stop recording to process the final section, then review the text before finding related Scripture.</p>
+    {(message||pending>0)&&<p className="muted" role="status">{pending>0?`Processing locally · ${pending} audio section(s). `:''}{message}</p>}
+  </div>;
+}

@@ -1,0 +1,13 @@
+# Shepherd Pro desktop shell
+
+The optional Electron shell runs the independent Shepherd Pro web application with its own loopback-only Node server. It opens one operator window, supports four presentation output windows and a stage window, and provides an **Outputs** menu to place those windows fullscreen on a connected display. Escape leaves output fullscreen. Closing the operator quits the application and signals the server to stop.
+
+Run `npm run build`, `npm --prefix desktop ci`, then `npm run desktop` from the repository root. Desktop dependencies are separate from the web app. `npm run package:mac` uses the configuration in `desktop/package.json`.
+
+The packaged application needs `dist/`, `data/`, `server/`, `shared/`, and the root `package.json` in Electron's resources directory; include any backend runtime dependencies there as well. The packaged shell itself is the `desktop/main.cjs` entry point. The backend receives `HOST=127.0.0.1`, an ephemeral `PORT`, and `DATA_DIR` under Electron's application user-data directory. It must expose `GET /api/health`. Bundled Bible resources remain separate from writable user data.
+
+The shell disables Node integration in all windows, enables renderer sandboxing and context isolation, rejects navigation outside its local origin, and permits new windows only for local `/output?channel=…` and `/stage` routes. Microphone access uses the operating system permission prompt. The packaging configuration includes a `NSMicrophoneUsageDescription` for macOS. A single-instance lock prevents duplicate operator processes.
+
+The shell passed a Linux virtual-display smoke test covering startup, scripture presentation, a separate synchronized output window, and shutdown. It has not been run or packaged on a Mac. Producing a distributable signed/notarized DMG requires macOS build tooling, Apple Developer signing credentials and notarization configuration supplied by the owner. An unsigned local build may trigger Gatekeeper. Microphone capture feeds the local whisper.cpp adapter; install its executable/model using the Mac setup guide and test real audio before relying on transcription. Electron output windows provide ordinary display presentation, not native NDI transmission. Native NDI and automatic device licensing are not implemented by this shell. Local speech/model files are installed separately; see [local setup](../docs/LOCAL_MAC_SETUP.md).
+
+Do not ship provider keys in renderer code, the installer, or committed files. Configure a provider on the local server or a separately operated service. No Pewbeam code, assets, private endpoints or credentials are used by this shell.

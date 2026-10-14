@@ -1,0 +1,92 @@
+{
+  "application": "Pewbeam",
+  "version": "2.6.14",
+  "platform": "macOS ARM64",
+  "dmgSha256": "e0dd053d8fb4ac2536180438bb744cbab1c584bd0b5c496c28551cd821fcddf8",
+  "executableSha256": "6118e46780eb424666bdbcbaa96ae6f34d5267a83017e44c1d795eaca53150e2",
+  "asset": {
+    "name": "/assets/index-Dks7hXHS.js",
+    "tableOffset": 58722056,
+    "pathOffset": 29870141,
+    "compressedOffset": 29870166,
+    "compressedLength": 444613,
+    "length": 1754867,
+    "sha256": "4b3d283860b03448e8b36cd58f972c6a1c8c642ab424377396357dbc4615831d"
+  },
+  "formattedSourceSha256": "425bff8e47c069a48434e321669e59443b99ad8efaf39d96b78d38e405280388",
+  "reaArtifactEvidenceId": "ev_1d22ef61735360fc092a4e378e63b95a3c3fa444ae845e571e3cbcf2e0fe0214",
+  "reaJavascriptEvidenceId": "ev_a01cae83c09bfbf92215e80acdb49efb50ee27db1cbdefc39a79084e67dd204b",
+  "scope": "Main 1,754,867-byte JavaScript bundle. 363,754 AST nodes visited; zero parse failures. Not a complete native or vendor-bundle analysis.",
+  "observations": [
+    {
+      "id": "S1",
+      "title": "Book and context mode routing",
+      "startLine": 71373,
+      "endLine": 71394,
+      "excerpt": "71373:       (Rt(OH(Ct, ti)), ei(!1));\n71374:       return;\n71375:     }\n71376:     return (\n71377:       (async () => {\n71378:         ei(!0);\n71379:         try {\n71380:           if (Ct === \"context\") {\n71381:             if (be.length < 3) {\n71382:               Rt(null);\n71383:               return;\n71384:             }\n71385:             if ((await Zv(320), R || he !== Ke.current)) return;\n71386:             const Re = HF(be),\n71387:               qe = await cB(Re, ie, 10, 0.5);\n71388:             if (R || he !== Ke.current) return;\n71389:             (qe.length > 0 && dn.getState().incrementSearchCount(),\n71390:               Rt(Wv(\"CONTEXT RESULTS\", qe)));\n71391:             return;\n71392:           }\n71393:           const ye = Zp(be);\n71394:           if (ye.book && ye.chapter) {"
+    },
+    {
+      "id": "S2",
+      "title": "Chapter lookup",
+      "startLine": 71397,
+      "endLine": 71412,
+      "excerpt": "71397:               mt = await xt.getChapter(ie, Re, qe);\n71398:             if (R || he !== Ke.current) return;\n71399:             if (!mt) {\n71400:               Rt(null);\n71401:               return;\n71402:             }\n71403:             const pn =\n71404:                 Uv(t$(H, q), Re, qe, ie) ??\n71405:                 Uv(V, Re, qe, ie) ??\n71406:                 (ye.verse ? { start: ye.verse, end: ye.verse } : null),\n71407:               Yr = {\n71408:                 title: `${Re.toUpperCase()} ${qe}`,\n71409:                 verses: Object.entries(mt)\n71410:                   .map(([zn, Br]) => ({\n71411:                     num: Number(zn),\n71412:                     text: Br,"
+    },
+    {
+      "id": "S3",
+      "title": "Book keyword debounce",
+      "startLine": 71420,
+      "endLine": 71428,
+      "excerpt": "71420:           }\n71421:           if (be.length < 2) {\n71422:             Rt(null);\n71423:             return;\n71424:           }\n71425:           if ((await Zv(260), R || he !== Ke.current)) return;\n71426:           const Ie = await f$(be, ie, a$);\n71427:           if (R || he !== Ke.current) return;\n71428:           Rt(Wv(\"BOOK SEARCH RESULTS\", Ie));"
+    },
+    {
+      "id": "S4",
+      "title": "Direct match requirement",
+      "startLine": 55822,
+      "endLine": 55833,
+      "excerpt": "55822: }\n55823: function DF(e, n) {\n55824:   const t = e.toLowerCase(),\n55825:     r = n\n55826:       .toLowerCase()\n55827:       .split(/\\s+/)\n55828:       .filter((a) => a.length > 0);\n55829:   return r.length === 0 ? !1 : r.every((a) => t.includes(a));\n55830: }\n55831: function IF(e, n) {\n55832:   const t = e.toLowerCase(),\n55833:     r = n"
+    },
+    {
+      "id": "S5",
+      "title": "Direct ranking bonuses",
+      "startLine": 55835,
+      "endLine": 55862,
+      "excerpt": "55835:       .split(/\\s+/)\n55836:       .filter((p) => p.length > 0);\n55837:   if (r.length === 0) return 0;\n55838:   let a = 0.7;\n55839:   const i = [];\n55840:   for (const p of r) {\n55841:     const g = t.indexOf(p);\n55842:     g !== -1 && i.push(g);\n55843:   }\n55844:   const s = Math.min(r.length * 0.02, 0.1);\n55845:   if (((a += s), i.length > 0)) {\n55846:     const p = Math.min(...i);\n55847:     p === 0 ? (a += 0.1) : p < 20 && (a += 0.05);\n55848:   }\n55849:   const l = n.length,\n55850:     d = e.length,\n55851:     c = l / d,\n55852:     u = Math.min(c * 0.1, 0.1);\n55853:   if (((a += u), i.length > 1)) {\n55854:     i.sort((m, x) => m - x);\n55855:     const p = i[i.length - 1] - i[0],\n55856:       h = Math.max(0, 1 - p / d) * 0.1;\n55857:     a += h;\n55858:   }\n55859:   return Math.min(a, 1);\n55860: }\n55861: async function RF(e, n, t = {}) {\n55862:   const { maxResults: r = 10, minScore: a = 0.5 } = t;"
+    },
+    {
+      "id": "S6",
+      "title": "Search result fusion",
+      "startLine": 56731,
+      "endLine": 56767,
+      "excerpt": "56731:     return (console.error(\"❌ Regex reference search error:\", t), []);\n56732:   }\n56733: }\n56734: function iB(e, n, t, r = []) {\n56735:   const a = new Map();\n56736:   for (const s of t) {\n56737:     const l = Pc(s),\n56738:       d = s.relevance_score ?? 1;\n56739:     a.set(l, { verse: s, score: 0.95 + d * 0.05, source: \"regex\" });\n56740:   }\n56741:   for (const s of r) {\n56742:     const l = Pc(s);\n56743:     if (!a.has(l)) {\n56744:       const d = s.relevance_score ?? 1;\n56745:       a.set(l, { verse: s, score: 0.9 + d * 0.05, source: \"shingle\" });\n56746:     }\n56747:   }\n56748:   for (const s of e) {\n56749:     const l = Pc(s);\n56750:     if (!a.has(l)) {\n56751:       const d = s.relevance_score ?? 1;\n56752:       a.set(l, { verse: s, score: 0.85 + d * 0.05, source: \"direct\" });\n56753:     }\n56754:   }\n56755:   for (const s of n) {\n56756:     const l = Pc(s);\n56757:     if (!a.has(l)) {\n56758:       const d = s.relevance_score ?? 1;\n56759:       a.set(l, { verse: s, score: 0.7 + d * 0.14, source: \"fuzzy\" });\n56760:     }\n56761:   }\n56762:   return Array.from(a.values())\n56763:     .sort((s, l) => l.score - s.score)\n56764:     .map((s) => ({\n56765:       ...s.verse,\n56766:       relevance_score: s.score,\n56767:       search_source: s.source,"
+    },
+    {
+      "id": "S7",
+      "title": "Semantic entitlement gate",
+      "startLine": 56833,
+      "endLine": 56848,
+      "excerpt": "56833: async function lB(e) {\n56834:   const n = Qe.getState().getEffectiveTier() === \"free\",\n56835:     t = tn.getState();\n56836:   return n && (t.requiresAccount() || !t.isInitialized)\n56837:     ? (ee.debug(\"[Search] Semantic search blocked: needs a signed-in account\"),\n56838:       { success: !1, data: [], error: \"trial_expired\" })\n56839:     : dn.getState().isSearchLimitReached()\n56840:       ? (ee.debug(\n56841:           \"[Search] Semantic search skipped: lifetime search allowance reached\",\n56842:         ),\n56843:         { success: !0, data: [] })\n56844:       : await se(\"search_verses_semantic\", e);\n56845: }\n56846: async function cB(e, n, t = 5, r = 0.6) {\n56847:   try {\n56848:     const a = await lB({ query: e, top_k: t, min_score: r, translation: n });"
+    },
+    {
+      "id": "S8",
+      "title": "Book mode fallback",
+      "startLine": 72751,
+      "endLine": 72770,
+      "excerpt": "72751: async function f$(e, n, t) {\n72752:   const r = await BF(e, n, { maxResults: t, minScore: 0.45 }).catch(() => []);\n72753:   if (r.length >= t) return r.slice(0, t);\n72754:   const a = await p$(e, n).catch(() => []),\n72755:     i =\n72756:       r.length > 0\n72757:         ? []\n72758:         : await sB(e, n, { maxResults: t, minScore: 0.45 }).catch(() => []);\n72759:   return h$([...r, ...a, ...i]).slice(0, t);\n72760: }\n72761: async function p$(e, n) {\n72762:   if (typeof window > \"u\" || !(\"__TAURI__\" in window)) return [];\n72763:   const t = await se(\"search_verses\", {\n72764:     query: e,\n72765:     mode: \"verbatim\",\n72766:     translation: n,\n72767:   });\n72768:   return !t?.success || !t.data ? [] : t.data;\n72769: }\n72770: function h$(e) {"
+    },
+    {
+      "id": "T1",
+      "title": "Tier entitlements",
+      "startLine": 8898,
+      "endLine": 8933,
+      "excerpt": "8898:   return tn((e) => (e.status?.signedIn ?? !1) && !(e.status?.unlimited ?? !1));\n8899: }\n8900: function M_() {\n8901:   return localStorage.getItem(E_) !== null;\n8902: }\n8903: const $b = {\n8904:     free: {\n8905:       noWatermark: !1,\n8906:       allThemes: !1,\n8907:       unlimitedSession: !1,\n8908:       multiDevice: !1,\n8909:       prioritySupport: !1,\n8910:       advancedAi: !1,\n8911:       sermonNotes: !1,\n8912:     },\n8913:     plus: {\n8914:       noWatermark: !0,\n8915:       allThemes: !0,\n8916:       unlimitedSession: !0,\n8917:       multiDevice: !1,\n8918:       prioritySupport: !1,\n8919:       advancedAi: !1,\n8920:       sermonNotes: !0,\n8921:     },\n8922:     core: {\n8923:       noWatermark: !0,\n8924:       allThemes: !0,\n8925:       unlimitedSession: !0,\n8926:       multiDevice: !0,\n8927:       prioritySupport: !0,\n8928:       advancedAi: !0,\n8929:       sermonNotes: !0,\n8930:     },\n8931:   },\n8932:   D_ = {\n8933:     isLicensed: !1,"
+    },
+    {
+      "id": "T2",
+      "title": "Plan comparison",
+      "startLine": 66994,
+      "endLine": 67019,
+      "excerpt": "66994: const Kz = \"https://pewbeam.com/pricing\",\n66995:   Tv = { explorer: 0, plus: 1, core: 2 },\n66996:   Jz = [\n66997:     { label: \"AI Bible verse detection\" },\n66998:     { label: \"Transcription\", note: \"60 mins\" },\n66999:     { label: \"AI slide generation\", note: \"1\" },\n67000:     { label: \"Bible translations\", note: \"4\" },\n67001:     { label: \"Built-in themes\", note: \"2\" },\n67002:     { label: \"No watermark\", included: !1 },\n67003:   ],\n67004:   eH = [\n67005:     { label: \"Unlimited transcription\" },\n67006:     { label: \"No watermark\" },\n67007:     { label: \"Unlimited AI slide generation\" },\n67008:     { label: \"AI Sermon Notes\" },\n67009:     { label: \"Greek & Hebrew word study\" },\n67010:     { label: \"Offline transcription\" },\n67011:     { label: \"All themes\", note: \"Unlimited custom\" },\n67012:     { label: \"4 display outputs\" },\n67013:   ],\n67014:   tH = [\n67015:     { label: \"Device activations\", note: \"3\" },\n67016:     { label: \"Multiple machines at once\" },\n67017:     { label: \"Priority support\" },\n67018:     { label: \"Advanced AI features\" },\n67019:   ];"
+    }
+  ]
+}

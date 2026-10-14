@@ -1,0 +1,63 @@
+{
+  "name": "shepherd-pro-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shepherd Pro scripture and presentation studio",
+  "author": "Shepherd Pro contributors",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "package:mac": "electron-builder --mac --arm64"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "local.shepherdpro.studio",
+    "productName": "Shepherd Pro",
+    "directories": {
+      "output": "../release"
+    },
+    "files": [
+      "main.cjs",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist",
+        "to": "dist"
+      },
+      {
+        "from": "../data",
+        "to": "data"
+      },
+      {
+        "from": "../server",
+        "to": "server"
+      },
+      {
+        "from": "../docs",
+        "to": "docs"
+      },
+      {
+        "from": "../package.json",
+        "to": "package.json"
+      },
+      {
+        "from": "../shared",
+        "to": "shared"
+      }
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Shepherd Pro uses your microphone when you start live transcription."
+      }
+    }
+  }
+}

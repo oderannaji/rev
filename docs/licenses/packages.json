@@ -1,0 +1,87 @@
+[
+  {
+    "package": "react",
+    "version": "19.3.0",
+    "license": "MIT"
+  },
+  {
+    "package": "react-dom",
+    "version": "19.3.0",
+    "license": "MIT"
+  },
+  {
+    "package": "scheduler",
+    "version": "0.28.0",
+    "license": "MIT"
+  },
+  {
+    "package": "lucide-react",
+    "version": "0.468.0",
+    "license": "ISC"
+  },
+  {
+    "package": "jszip",
+    "version": "3.10.2",
+    "license": "(MIT OR GPL-3.0-or-later)"
+  },
+  {
+    "package": "pako",
+    "version": "1.0.11",
+    "license": "(MIT AND Zlib)"
+  },
+  {
+    "package": "lie",
+    "version": "3.3.0",
+    "license": "MIT"
+  },
+  {
+    "package": "immediate",
+    "version": "3.0.6",
+    "license": "MIT"
+  },
+  {
+    "package": "setimmediate",
+    "version": "1.0.5",
+    "license": "MIT"
+  },
+  {
+    "package": "readable-stream",
+    "version": "2.3.8",
+    "license": "MIT"
+  },
+  {
+    "package": "safe-buffer",
+    "version": "5.1.2",
+    "license": "MIT"
+  },
+  {
+    "package": "inherits",
+    "version": "2.0.4",
+    "license": "ISC"
+  },
+  {
+    "package": "string_decoder",
+    "version": "1.1.1",
+    "license": "MIT"
+  },
+  {
+    "package": "util-deprecate",
+    "version": "1.0.2",
+    "license": "MIT"
+  },
+  {
+    "package": "pdfjs-dist",
+    "version": "5.7.284",
+    "license": "Apache-2.0"
+  },
+  {
+    "package": "pptxgenjs",
+    "version": "4.0.1",
+    "license": "MIT"
+  },
+  {
+    "package": "image-size",
+    "version": "1.2.1",
+    "license": "MIT"
+  }
+]

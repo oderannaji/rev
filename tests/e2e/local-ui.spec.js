@@ -1,0 +1,60 @@
+import {test,expect} from '@playwright/test';
+import {validateWav} from '../../server/speech.js';
+
+test.beforeEach(async({request,page})=>{await request.put('/api/state',{data:{}});await page.goto('/');await expect(page.getByLabel('Preview John 3:16',{exact:true})).toBeVisible();});
+test('transparent OBS overlay clears and blacks out without covering the camera',async({page,context})=>{
+  const output=await context.newPage();await output.goto('/output?channel=lowerthird');
+  await expect(output.locator('html')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
+  await expect(output.locator('body')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
+  await expect(output.locator('.canvas-empty')).toHaveCount(0);
+  await page.getByLabel('Preview John 3:16',{exact:true}).click();await page.getByRole('button',{name:'Take live',exact:true}).click();
+  await expect(output.locator('.projection-reference')).toContainText('John 3:16');
+  await page.getByRole('button',{name:/Blackout/}).click();
+  await expect(output.locator('.projection')).toHaveClass(/blacked/);
+  await expect(output.locator('.projection')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
+  await expect(output.locator('.projection-copy')).toHaveCount(0);
+});
+test('local model settings and Context mode explain missing setup',async({page})=>{
+  await page.getByRole('button',{name:'Context',exact:true}).click();await page.getByLabel('Search Scripture').fill('when I feel alone');
+  await expect(page.locator('.results-list .inline-error')).toContainText('Enable local AI');
+  await page.getByRole('button',{name:'Settings',exact:true}).click();
+  await expect(page.getByLabel('Local search model')).toHaveValue('embeddinggemma:latest');
+  await expect(page.getByLabel('Local drafting model')).toHaveValue('qwen3:4b');
+  await expect(page.getByRole('button',{name:'Copy OBS lower-third URL'})).toBeVisible();
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Use offline microphone'})).toBeDisabled();
+  await expect(page.getByText(/Configure local Whisper in Settings/)).toBeVisible();
+});
+test('microphone worklet produces valid local PCM WAV and appends returned transcript',async({page,context})=>{
+  await context.grantPermissions(['microphone']);
+  await page.route('**/api/speech/status',route=>route.fulfill({json:{available:true}}));
+  let seconds=0;
+  await page.route('**/api/speech/transcribe',async route=>{const input=route.request().postDataJSON();seconds=validateWav(Buffer.from(input.audio,'base64')).seconds;await route.fulfill({json:{text:'We read John chapter three verse sixteen.',language:'en'}});});
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await page.getByRole('button',{name:'Use offline microphone'}).click();
+  await expect(page.getByRole('button',{name:'Stop recording'})).toBeVisible();
+  // Give the synthetic microphone enough real audio time for a valid chunk.
+  await page.waitForTimeout(1100);
+  await page.getByRole('button',{name:'Stop recording'}).click();
+  await expect(page.getByLabel('Transcript text')).toContainText('John chapter three');expect(seconds).toBeGreaterThan(.5);
+});
+test('input level test works without Whisper, selects a device, and sends no audio to transcription',async({page,context})=>{
+  await context.grantPermissions(['microphone']);
+  await page.route('**/api/speech/status',route=>route.fulfill({json:{available:false}}));
+  let transcriptionRequests=0;
+  await page.route('**/api/speech/transcribe',route=>{transcriptionRequests++;return route.fulfill({json:{text:'Unexpected transcription'}});});
+  await page.evaluate(()=>{const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);navigator.mediaDevices.getUserMedia=constraints=>{window.lastAudioConstraints=constraints;return original(constraints);};});
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Use offline microphone'})).toBeDisabled();
+  await expect.poll(()=>page.getByLabel('Audio input',{exact:true}).locator('option').count()).toBeGreaterThan(1);
+  const chosen=await page.getByLabel('Audio input',{exact:true}).locator('option').nth(1).getAttribute('value');
+  await page.getByLabel('Audio input',{exact:true}).selectOption(chosen);
+  await page.getByRole('button',{name:'Test microphone level'}).click();
+  await expect(page.getByText('Audio is reaching the app.',{exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>window.lastAudioConstraints.audio.deviceId.exact)).toBe(chosen);
+  await expect(page.getByLabel('Audio input',{exact:true})).toBeDisabled();
+  await page.getByRole('button',{name:'Stop microphone test'}).click();
+  await expect(page.getByLabel('Microphone input level')).toHaveAttribute('value','0');
+  await expect(page.getByLabel('Audio input',{exact:true})).toBeEnabled();
+  await expect(page.getByLabel('Transcript text')).toHaveValue('');expect(transcriptionRequests).toBe(0);
+});

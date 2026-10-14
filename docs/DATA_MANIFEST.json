@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "path": "data/BSB.json",
+      "sha256": "de2f5941fb670fb3bc9b6497c22cf6b4b311ad37174cad03d5ab6f99292c3636",
+      "bytes": 5489985
+    },
+    {
+      "path": "public/lexicon.json",
+      "sha256": "9b422456ead9565a1250a02fd4009172ce9ff7866502ab66c964b59c475820c2",
+      "bytes": 3456446
+    }
+  ]
+}

@@ -1,0 +1,246 @@
+# Bounded excerpts from the uploaded Pewbeam 2.6.14 bundle
+
+Static inspection only. Line numbers refer to the locally formatted index-readable.js.
+No application runtime was executed. Excerpts are evidence, not implementation instructions.
+
+## S1 — Book and context mode routing
+71373:       (Rt(OH(Ct, ti)), ei(!1));
+71374:       return;
+71375:     }
+71376:     return (
+71377:       (async () => {
+71378:         ei(!0);
+71379:         try {
+71380:           if (Ct === "context") {
+71381:             if (be.length < 3) {
+71382:               Rt(null);
+71383:               return;
+71384:             }
+71385:             if ((await Zv(320), R || he !== Ke.current)) return;
+71386:             const Re = HF(be),
+71387:               qe = await cB(Re, ie, 10, 0.5);
+71388:             if (R || he !== Ke.current) return;
+71389:             (qe.length > 0 && dn.getState().incrementSearchCount(),
+71390:               Rt(Wv("CONTEXT RESULTS", qe)));
+71391:             return;
+71392:           }
+71393:           const ye = Zp(be);
+71394:           if (ye.book && ye.chapter) {
+
+## S2 — Chapter lookup
+71397:               mt = await xt.getChapter(ie, Re, qe);
+71398:             if (R || he !== Ke.current) return;
+71399:             if (!mt) {
+71400:               Rt(null);
+71401:               return;
+71402:             }
+71403:             const pn =
+71404:                 Uv(t$(H, q), Re, qe, ie) ??
+71405:                 Uv(V, Re, qe, ie) ??
+71406:                 (ye.verse ? { start: ye.verse, end: ye.verse } : null),
+71407:               Yr = {
+71408:                 title: `${Re.toUpperCase()} ${qe}`,
+71409:                 verses: Object.entries(mt)
+71410:                   .map(([zn, Br]) => ({
+71411:                     num: Number(zn),
+71412:                     text: Br,
+
+## S3 — Book keyword debounce
+71420:           }
+71421:           if (be.length < 2) {
+71422:             Rt(null);
+71423:             return;
+71424:           }
+71425:           if ((await Zv(260), R || he !== Ke.current)) return;
+71426:           const Ie = await f$(be, ie, a$);
+71427:           if (R || he !== Ke.current) return;
+71428:           Rt(Wv("BOOK SEARCH RESULTS", Ie));
+
+## S4 — Direct match requirement
+55822: }
+55823: function DF(e, n) {
+55824:   const t = e.toLowerCase(),
+55825:     r = n
+55826:       .toLowerCase()
+55827:       .split(/\s+/)
+55828:       .filter((a) => a.length > 0);
+55829:   return r.length === 0 ? !1 : r.every((a) => t.includes(a));
+55830: }
+55831: function IF(e, n) {
+55832:   const t = e.toLowerCase(),
+55833:     r = n
+
+## S5 — Direct ranking bonuses
+55835:       .split(/\s+/)
+55836:       .filter((p) => p.length > 0);
+55837:   if (r.length === 0) return 0;
+55838:   let a = 0.7;
+55839:   const i = [];
+55840:   for (const p of r) {
+55841:     const g = t.indexOf(p);
+55842:     g !== -1 && i.push(g);
+55843:   }
+55844:   const s = Math.min(r.length * 0.02, 0.1);
+55845:   if (((a += s), i.length > 0)) {
+55846:     const p = Math.min(...i);
+55847:     p === 0 ? (a += 0.1) : p < 20 && (a += 0.05);
+55848:   }
+55849:   const l = n.length,
+55850:     d = e.length,
+55851:     c = l / d,
+55852:     u = Math.min(c * 0.1, 0.1);
+55853:   if (((a += u), i.length > 1)) {
+55854:     i.sort((m, x) => m - x);
+55855:     const p = i[i.length - 1] - i[0],
+55856:       h = Math.max(0, 1 - p / d) * 0.1;
+55857:     a += h;
+55858:   }
+55859:   return Math.min(a, 1);
+55860: }
+55861: async function RF(e, n, t = {}) {
+55862:   const { maxResults: r = 10, minScore: a = 0.5 } = t;
+
+## S6 — Search result fusion
+56731:     return (console.error("❌ Regex reference search error:", t), []);
+56732:   }
+56733: }
+56734: function iB(e, n, t, r = []) {
+56735:   const a = new Map();
+56736:   for (const s of t) {
+56737:     const l = Pc(s),
+56738:       d = s.relevance_score ?? 1;
+56739:     a.set(l, { verse: s, score: 0.95 + d * 0.05, source: "regex" });
+56740:   }
+56741:   for (const s of r) {
+56742:     const l = Pc(s);
+56743:     if (!a.has(l)) {
+56744:       const d = s.relevance_score ?? 1;
+56745:       a.set(l, { verse: s, score: 0.9 + d * 0.05, source: "shingle" });
+56746:     }
+56747:   }
+56748:   for (const s of e) {
+56749:     const l = Pc(s);
+56750:     if (!a.has(l)) {
+56751:       const d = s.relevance_score ?? 1;
+56752:       a.set(l, { verse: s, score: 0.85 + d * 0.05, source: "direct" });
+56753:     }
+56754:   }
+56755:   for (const s of n) {
+56756:     const l = Pc(s);
+56757:     if (!a.has(l)) {
+56758:       const d = s.relevance_score ?? 1;
+56759:       a.set(l, { verse: s, score: 0.7 + d * 0.14, source: "fuzzy" });
+56760:     }
+56761:   }
+56762:   return Array.from(a.values())
+56763:     .sort((s, l) => l.score - s.score)
+56764:     .map((s) => ({
+56765:       ...s.verse,
+56766:       relevance_score: s.score,
+56767:       search_source: s.source,
+
+## S7 — Semantic entitlement gate
+56833: async function lB(e) {
+56834:   const n = Qe.getState().getEffectiveTier() === "free",
+56835:     t = tn.getState();
+56836:   return n && (t.requiresAccount() || !t.isInitialized)
+56837:     ? (ee.debug("[Search] Semantic search blocked: needs a signed-in account"),
+56838:       { success: !1, data: [], error: "trial_expired" })
+56839:     : dn.getState().isSearchLimitReached()
+56840:       ? (ee.debug(
+56841:           "[Search] Semantic search skipped: lifetime search allowance reached",
+56842:         ),
+56843:         { success: !0, data: [] })
+56844:       : await se("search_verses_semantic", e);
+56845: }
+56846: async function cB(e, n, t = 5, r = 0.6) {
+56847:   try {
+56848:     const a = await lB({ query: e, top_k: t, min_score: r, translation: n });
+
+## S8 — Book mode fallback
+72751: async function f$(e, n, t) {
+72752:   const r = await BF(e, n, { maxResults: t, minScore: 0.45 }).catch(() => []);
+72753:   if (r.length >= t) return r.slice(0, t);
+72754:   const a = await p$(e, n).catch(() => []),
+72755:     i =
+72756:       r.length > 0
+72757:         ? []
+72758:         : await sB(e, n, { maxResults: t, minScore: 0.45 }).catch(() => []);
+72759:   return h$([...r, ...a, ...i]).slice(0, t);
+72760: }
+72761: async function p$(e, n) {
+72762:   if (typeof window > "u" || !("__TAURI__" in window)) return [];
+72763:   const t = await se("search_verses", {
+72764:     query: e,
+72765:     mode: "verbatim",
+72766:     translation: n,
+72767:   });
+72768:   return !t?.success || !t.data ? [] : t.data;
+72769: }
+72770: function h$(e) {
+
+## T1 — Tier entitlements
+8898:   return tn((e) => (e.status?.signedIn ?? !1) && !(e.status?.unlimited ?? !1));
+8899: }
+8900: function M_() {
+8901:   return localStorage.getItem(E_) !== null;
+8902: }
+8903: const $b = {
+8904:     free: {
+8905:       noWatermark: !1,
+8906:       allThemes: !1,
+8907:       unlimitedSession: !1,
+8908:       multiDevice: !1,
+8909:       prioritySupport: !1,
+8910:       advancedAi: !1,
+8911:       sermonNotes: !1,
+8912:     },
+8913:     plus: {
+8914:       noWatermark: !0,
+8915:       allThemes: !0,
+8916:       unlimitedSession: !0,
+8917:       multiDevice: !1,
+8918:       prioritySupport: !1,
+8919:       advancedAi: !1,
+8920:       sermonNotes: !0,
+8921:     },
+8922:     core: {
+8923:       noWatermark: !0,
+8924:       allThemes: !0,
+8925:       unlimitedSession: !0,
+8926:       multiDevice: !0,
+8927:       prioritySupport: !0,
+8928:       advancedAi: !0,
+8929:       sermonNotes: !0,
+8930:     },
+8931:   },
+8932:   D_ = {
+8933:     isLicensed: !1,
+
+## T2 — Plan comparison
+66994: const Kz = "https://pewbeam.com/pricing",
+66995:   Tv = { explorer: 0, plus: 1, core: 2 },
+66996:   Jz = [
+66997:     { label: "AI Bible verse detection" },
+66998:     { label: "Transcription", note: "60 mins" },
+66999:     { label: "AI slide generation", note: "1" },
+67000:     { label: "Bible translations", note: "4" },
+67001:     { label: "Built-in themes", note: "2" },
+67002:     { label: "No watermark", included: !1 },
+67003:   ],
+67004:   eH = [
+67005:     { label: "Unlimited transcription" },
+67006:     { label: "No watermark" },
+67007:     { label: "Unlimited AI slide generation" },
+67008:     { label: "AI Sermon Notes" },
+67009:     { label: "Greek & Hebrew word study" },
+67010:     { label: "Offline transcription" },
+67011:     { label: "All themes", note: "Unlimited custom" },
+67012:     { label: "4 display outputs" },
+67013:   ],
+67014:   tH = [
+67015:     { label: "Device activations", note: "3" },
+67016:     { label: "Multiple machines at once" },
+67017:     { label: "Priority support" },
+67018:     { label: "Advanced AI features" },
+67019:   ];
