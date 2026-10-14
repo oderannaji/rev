@@ -90,3 +90,26 @@ test('opt-in automatic presentation takes a finalized verse live while listening
   await expect(page.getByRole('button',{name:'Stop recording'})).toBeVisible();
   await page.getByRole('button',{name:'Stop recording'}).click();
 });
+test('voice control waits for a completed phrase and does not replay commands when enabled',async({page,context,request})=>{
+  await context.grantPermissions(['microphone']);
+  await request.put('/api/state',{data:{queue:[{id:'welcome',title:'Welcome',text:'Welcome everyone'},{id:'prayer',title:'Prayer',text:'Let us pray'}]}});
+  await page.route('**/api/speech/status',route=>route.fulfill({json:{available:true,liveAvailable:true}}));
+  await page.route('**/api/speech/prepare',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/speech/transcribe',route=>route.fulfill({json:{text:'Shepherd next slide.',inferenceMs:100}}));
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await page.getByRole('button',{name:'Start live listening'}).click();
+  await expect(page.getByLabel('Live transcript draft')).toContainText('Shepherd next slide');
+  await page.getByRole('button',{name:'Stop recording'}).click();
+  await expect(page.getByLabel('Transcript text')).toContainText('Shepherd next slide');
+  await page.getByLabel('Enable voice commands for this session').check();
+  await expect(page.locator('.live-section .projection-reference')).toHaveCount(0);
+  await page.getByRole('button',{name:'Start live listening'}).click();
+  await expect(page.getByLabel('Live transcript draft')).toContainText('Shepherd next slide');
+  await expect(page.locator('.live-section .projection-reference')).toHaveCount(0);
+  await page.getByRole('button',{name:'Stop recording'}).click();
+  await expect(page.locator('.live-section .projection-reference')).toContainText('Welcome');
+  await page.getByText('Customize command phrases',{exact:true}).click();
+  await page.getByLabel('Next queue item voice phrase').fill('move forward');
+  await page.getByRole('button',{name:'Save command phrases'}).click();
+  await expect.poll(async()=> (await (await request.get('/api/state')).json()).voiceCommands?.next).toBe('move forward');
+});
