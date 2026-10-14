@@ -9,7 +9,7 @@ export function useLiveScripture({utterance,translation,enabled,neural}){
     async function run(){
       if(busy.current)return;busy.current=true;
       try{while(alive.current&&latest.current){const task=latest.current;latest.current=null;setState(s=>({...s,busy:true}));request.current=new AbortController();
-        try{const response=await fetch('/api/scripture/detect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...task.input,context:context.current}),signal:request.current.signal});const data=await response.json();if(!response.ok)throw Error(data.error);if(alive.current&&task.version===serial.current){if(data.context)context.current=data.context;setState({...data,busy:false});}}
+        try{const response=await fetch('/api/scripture/detect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...task.input,context:context.current}),signal:request.current.signal});const data=await response.json();if(!response.ok)throw Error(data.error);if(alive.current&&task.version===serial.current){if(data.context)context.current=data.context;setState({...data,busy:false,sourceText:task.input.text,sourceFinal:task.input.final});}}
         catch(e){if(alive.current&&task.version===serial.current)setState(s=>({...s,busy:false,warning:e.message}));}
       }}finally{busy.current=false;}
     }
