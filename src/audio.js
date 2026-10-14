@@ -14,7 +14,8 @@ export async function captureMicrophone(onChunk,onError,{deviceId='',onLevel=()=
   const stop=async(save=true)=>{if(closed)return;closed=true;if(worklet)worklet.port.onmessage=null;stream.getTracks().forEach(t=>t.stop());source?.disconnect();worklet?.disconnect();mute?.disconnect();if(utterances)utterances.stop(save);else if(save)flush();onLevel(0);if(context&&context.state!=='closed')await context.close();};
   try{
     context=new AudioContext({sampleRate:16000});
-    if(live&&collect)utterances=createUtterances({rate:context.sampleRate,emit:(samples,meta)=>onChunk(pcmWav(samples,context.sampleRate),meta)});
+    const captureId=crypto.randomUUID();
+    if(live&&collect)utterances=createUtterances({rate:context.sampleRate,emit:(samples,meta)=>onChunk(pcmWav(samples,context.sampleRate),{...meta,id:`${captureId}:${meta.id}`})});
     await context.audioWorklet.addModule('/speech-worklet.js');worklet=new AudioWorkletNode(context,'shepherd-recorder');source=context.createMediaStreamSource(stream);mute=context.createGain();mute.gain.value=0;source.connect(worklet);worklet.connect(mute);mute.connect(context.destination);
     worklet.port.onmessage=({data})=>{if(closed)return;const now=performance.now();if(now-lastLevel>=100){let sum=0;for(const sample of data)sum+=sample*sample;onLevel(Math.sqrt(sum/Math.max(1,data.length)));lastLevel=now;}if(utterances)utterances.push(data);else if(collect){parts.push(data);size+=data.length;if(size>=context.sampleRate*20)flush();}};
     stream.getAudioTracks()[0].onended=()=>{onError(Error('The microphone disconnected.'));void stop();};
