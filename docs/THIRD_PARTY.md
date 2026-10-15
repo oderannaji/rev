@@ -1,8 +1,10 @@
 # Data and dependencies
 
+The bundled Bible choices and their translation-specific notices are summarized in [Bible sources](BIBLE_SOURCES.md).
+
 ## Berean Standard Bible
 
-`data/BSB.json` derives from the [Scrollmapper BSB JSON](https://github.com/scrollmapper/bible_databases/blob/master/formats/json/BSB.json). The [source translation notice](https://github.com/scrollmapper/bible_databases/blob/master/sources/en/BSB/README.md) declares **Creative Commons CC0**. Berean Standard Bible attribution is retained here and in the app’s translation name.
+`data/BSB.json` derives from the [Scrollmapper BSB JSON](https://github.com/scrollmapper/bible_databases/blob/master/formats/json/BSB.json). The [source translation notice](https://github.com/scrollmapper/bible_databases/blob/master/sources/en/BSB/README.md) declares **Creative Commons CC0**. A [local copy of the CC0 notice](licenses/BSB-translation-notice.md) is retained. Berean Standard Bible attribution is retained here and in the app’s translation name.
 
 The source has 31,102 verse slots across 66 books. Sixteen slots contain no text; Shepherd Pro omits these from the searchable dataset instead of supplying invented verses. It contains **31,086 nonempty verses**, preserving original references, book names, and text. The JSON was normalized to `{id,name,verses:[{book,chapter,verse,text}]}`. Existing Roman-numbered book names are supported by the search alias layer.
 
