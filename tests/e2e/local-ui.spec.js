@@ -149,3 +149,24 @@ test('live listening survives tool navigation and can be stopped outside Transcr
   await expect(page.getByRole('button',{name:'Start live listening'})).toBeEnabled();
   await expect(page.getByLabel('Auto-show confirmed single-verse references')).toBeChecked();
 });
+test('Scripture navigation changes the displayed verse and accepts spoken verse jumps',async({page,context})=>{
+  await context.grantPermissions(['microphone']);
+  await page.getByLabel('Preview John 3:16',{exact:true}).click();
+  await page.getByRole('button',{name:'Take live',exact:true}).click();
+  await page.getByRole('button',{name:'Next verse',exact:true}).click();
+  await expect(page.locator('.live-section .projection-reference')).toContainText('John 3:17');
+  await page.getByRole('button',{name:'Previous chapter',exact:true}).click();
+  await expect(page.locator('.live-section .projection-reference')).toContainText('John 2:1');
+  await page.route('**/api/speech/status',route=>route.fulfill({json:{available:true,liveAvailable:true}}));
+  await page.route('**/api/speech/prepare',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/speech/transcribe',route=>route.fulfill({json:{text:'Shepherd go to verse eleven.',inferenceMs:100}}));
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await page.getByLabel('Enable voice commands for this session').check();
+  await page.getByRole('button',{name:'Start live listening'}).click();
+  await expect(page.getByLabel('Live transcript draft')).toContainText('verse eleven');
+  await expect(page.locator('.live-section .projection-reference')).toContainText('John 2:1');
+  await page.getByRole('button',{name:'Stop recording'}).click();
+  await expect(page.locator('.live-section .projection-reference')).toContainText('John 2:11');
+  await page.setViewportSize({width:390,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

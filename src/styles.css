@@ -17,3 +17,9 @@ html[data-output="lowerthird"],html[data-output="lowerthird"] body,html[data-out
 
 .listening-status { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin:0 28px 16px; padding:10px 14px; border:1px solid #446b5c; border-radius:10px; background:#193c30; color:#ecf5ef; font-size:13px; }
 .listening-status > span { flex:1; min-width:160px; }
+.scripture-navigation { margin:0 28px 16px; padding:12px 14px; border:1px solid var(--line); border-radius:10px; }
+.scripture-navigation > strong { display:block; margin-bottom:8px; font-size:13px; }
+.scripture-navigation label { display:flex; align-items:center; gap:8px; font-size:12px; }
+.scripture-navigation input { width:80px; padding:7px; border:1px solid var(--line); border-radius:6px; }
+.scripture-navigation select { padding:7px; border:1px solid var(--line); border-radius:6px; }
+.scripture-navigation form { margin-top:8px; flex-wrap:wrap; }
