@@ -1,9 +1,9 @@
 import React from 'react';
 import {Plus,BookOpen} from 'lucide-react';
 import {useLiveScripture} from './useLiveScripture.js';
-export default function LiveScripture({utterance,translation,preview,addQueue,present,blackout}){
+export default function LiveScripture({utterance,translation,preview,addQueue,present,blackout,automatic,setAutomatic}){
   const [enabled,setEnabled]=React.useState(true),[neural,setNeural]=React.useState(true);
-  const [automatic,setAutomatic]=React.useState(false),lastPresented=React.useRef(null),presentRef=React.useRef(present);presentRef.current=present;
+  const lastPresented=React.useRef(null),presentRef=React.useRef(present);presentRef.current=present;
   const detection=useLiveScripture({utterance,translation,enabled,neural});
   React.useEffect(()=>{
     if(!automatic||!enabled||blackout||detection.busy||!detection.sourceFinal||detection.sourceText!==utterance.text.slice(-1500)||detection.kind!=='reference'||!detection.explicitVerse||detection.results.length!==1)return;
