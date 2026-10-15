@@ -8,4 +8,4 @@ Only finalized live-microphone phrases are eligible. Draft text, imported audio,
 
 Next and previous move through the service queue and preserve blackout. Take live presents the current preview and clears blackout. Resume clears blackout without changing the live item. Navigation stops at queue boundaries.
 
-Custom phrases can be saved in this panel and are included in state backups. Every action requires a distinct phrase. “Shepherd” remains the fixed wake word. The enabled switch resets on reload or leaving Transcripts. Stay on Transcripts while listening; navigating away releases the microphone.
+Custom phrases can be saved in this panel and are included in state backups. Every action requires a distinct phrase. “Shepherd” remains the fixed wake word. The enabled switch resets on page reload. Listening and voice controls continue when switching tools; use the shared Stop listening control to stop from any tool. Verse/chapter navigation and translation commands are documented in [Scripture navigation](SCRIPTURE_NAVIGATION.md).

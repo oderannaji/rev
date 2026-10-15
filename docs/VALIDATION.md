@@ -46,3 +46,24 @@ The updated desktop shell also passed a Linux Electron operator/output smoke che
 Production build and Bash syntax check passed. Four targeted Chromium checks passed: missing-model guidance; microphone PCM capture and returned transcript; the new input-device selection and level-only test with no transcription request; transcript persistence, related Scripture and export. Tests use Chromium synthetic audio and fixture recognition responses, not a real speech model. The level-only test also verified that stopping resets the meter and releases the input selector.
 
 No completed installer analysis, dependency installation, full test suite or cloud onboarding was repeated. The new speech-only setup branch was syntax-checked but has not been executed on macOS. Desktop/mobile microphone-screen checks found no overflow or page errors. See [microphone test screen](shepherd-pro-microphone-test.png).
+
+## Continuous web workflow — 14–15 October 2026
+
+Eight feature branches were implemented and merged into `integration/web`, leaving `main` as the preserved baseline. Production builds passed for all source changes. Targeted checks cover:
+
+- Persistent Whisper HTTP service startup/reuse/shutdown and audio-window partial/final handling (2 new Node tests); CLI/PCM/configuration checks also passed. The service test uses a fixture subprocess, not a Whisper model.
+- Automatic reference/range/correction/follow-up detection, invalid/incomplete references, quotation/fixture-meaning suggestions and same-origin API validation (4 new Node tests). A spoken-number failure was corrected; all 9 detection/search tests then passed.
+- Queue command matching/customization and navigation limits (2 Node tests); phrase-based slide matching and ambiguity rejection (2 Node tests); Scripture navigation and spoken verse/translation parsing (2 Node tests).
+- Chromium checks show a Scripture suggestion before Stop, finalized automatic Scripture output while recording continues, opt-in voice actions, spoken slide suggestions/display, continued listening after switching tools, shared stopping, retained transcript and spoken verse jumps. These are six new browser scenarios across targeted runs.
+- Existing missing-model, batch PCM, level-only microphone and transcript persistence scenarios were checked during the relevant changes. No synthetic response is reported as successful real recognition.
+- The last Scripture-navigation browser check also passed at a 390-pixel viewport without horizontal overflow.
+
+The voice-control check exposed that utterance IDs restarted at zero per microphone session. Capture IDs now include a unique session prefix, and the restart scenario passed. A slide test's expected word count was corrected from 11 to the actual 10; the matcher and browser checks passed. The two selected slide/automatic-presentation browser checks completed with saved runner status `passed` at 2026-10-14 18:56 UTC before the tool session expired.
+
+Existing REA 6.4.0 and the saved 2.6.14 artifact evidence were reused. A focused `trace-application-feature` query for `transcription_update` returned no graph seed match; that bounded result is not evidence that the event is absent. The retained formatted source at lines 71034–71092 directly shows its partial/final handling, and lines 56955–57055 show voice navigation. No installer re-extraction or full analysis was repeated.
+
+No real Whisper, EmbeddingGemma or Qwen model ran in this cloud environment. M5 latency/memory, Nigerian English accuracy, long-service recovery, OBS and EasyWorship reception remain unverified. Full Pewbeam parity is not claimed; see the current roadmap.
+
+Explicit command priority was verified by the spoken verse-jump scenario: no automatic detection request was made for the recognized command phrase. Both the queue-command and Scripture-command browser scenarios passed after sharing the session enable state.
+
+The integrated server was restarted on port 4173. Health identity, John 3:16 reference retrieval, navigation to verse 17 and automatic detection of a spoken John 3:16 reference all passed against the running backend. The updated Mac setup script passed Bash syntax checking; no Mac execution is implied. The reusable environment `start_skill` was updated to Shepherd Pro/current branches and saved as a draft; publication is separate.

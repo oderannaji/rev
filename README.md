@@ -2,6 +2,20 @@
 
 An independent local scripture and church-presentation studio, built after a static investigation of the Pewbeam installer you supplied. Its working local features are unrestricted. **Full Pewbeam feature parity is not complete**; see [coverage](docs/IMPLEMENTATION_STATUS.md).
 
+## Latest web feature build
+
+Use branch `integration/web` to test the combined web changes; `main` preserves the earlier baseline. Each feature has a separate branch, listed with evidence and remaining work in [the web roadmap](docs/REMAINING_WORK.md). From the existing checkout:
+
+```bash
+git fetch origin
+git switch integration/web
+git pull --ff-only
+npm run build
+npm start
+```
+
+Stop an older app server before restarting. Keep your existing data and models. The Mac desktop installer is deferred while the localhost workflow is completed.
+
 ## Start
 
 Requires Node.js 22.12+ (validated with Node 24) and npm.
@@ -28,7 +42,7 @@ The included BSB corpus contains 31,086 nonempty verses. Sixteen blank source sl
 
 Open **Transcripts → Test microphone level** and speak toward the Mac. Choose the built-in microphone using **Audio input**. This level test works before installing any AI model and does not transcribe or save audio.
 
-For the first actual transcription test, use `bash scripts/setup-local-mac.sh --speech-only`, save the printed Whisper paths in Settings, then choose **Use offline microphone**. Say a short English sentence and click **Stop recording** to process it. See [the step-by-step test](docs/LOCAL_MAC_SETUP.md) and [what remains](docs/REMAINING_WORK.md).
+For actual transcription, keep the existing Whisper setup and saved paths. Choose **Continuous live transcription → Start live listening**, speak a short English sentence, and watch the draft and Scripture suggestions before stopping. Pauses finalize phrases. Listening continues while switching tools. If the new live mode reports that `whisper-server` is missing, run the updated speech-only script to build that component; it reuses your model. See [the step-by-step test](docs/LOCAL_MAC_SETUP.md) and [what remains](docs/REMAINING_WORK.md).
 
 ## Save and backup
 
@@ -58,7 +72,7 @@ Content Studio’s **Structure notes** works locally without AI. With Local AI e
 
 The operator’s selected source notes are sent to that configured endpoint when they click **Draft with AI**. The adapter was tested against a mock provider; no real account, model, credentials or remote provider has been configured. All generated drafts need editorial review.
 
-## Mac desktop
+## Mac desktop (deferred)
 
 The optional shell and build configuration are in `desktop/`. On a Mac:
 

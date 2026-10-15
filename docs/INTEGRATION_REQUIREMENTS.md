@@ -1,6 +1,6 @@
 # Shepherd Pro: remaining integrations and Pewbeam evidence
 
-Updated 14 October 2026. These findings reuse the supplied Pewbeam 2.6.14 installer extraction. They identify shipped implementation paths, not observed execution on the user's Mac. Update: Shepherd Pro now includes local neural-search, Whisper and Ollama drafting adapters plus Mac setup instructions. Real model inference and Mac testing remain pending; direct native NDI remains unimplemented. See [current coverage](IMPLEMENTATION_STATUS.md), [Mac setup](LOCAL_MAC_SETUP.md) and [broadcast setup](BROADCAST_SETUP.md). The table below records the original evidence and integration requirements.
+Updated 15 October 2026. The owner supplied M5 / 16 GB / Tahoe 26.4, English, X32, OBS/EasyWorship 8.0.49 and a preference for local AI, and has run both setup scripts. The localhost web app is the current priority; desktop delivery is deferred. These findings reuse the supplied Pewbeam 2.6.14 installer extraction. They identify shipped implementation paths, not observed execution on the user's Mac. Update: Shepherd Pro now includes local neural-search, Whisper and Ollama drafting adapters plus Mac setup instructions. Real model inference and Mac testing remain pending; direct native NDI remains unimplemented. See [current coverage](IMPLEMENTATION_STATUS.md), [Mac setup](LOCAL_MAC_SETUP.md) and [broadcast setup](BROADCAST_SETUP.md). The table below records the original evidence and integration requirements.
 
 | Area | Evidence in Pewbeam | Proposed Shepherd Pro implementation | Input needed from the owner |
 | --- | --- | --- | --- |
@@ -24,4 +24,4 @@ Source files remain in `/workspace/pewbeam-analysis`; existing extraction and an
 
 Implement and evaluate neural retrieval first, then local speech and speech-to-scripture matching. Configure drafting using the owner's chosen provider. Add the native NDI bridge against the official SDK and test both sender and receiver on the actual network. Validate the combined build on the Mac before signing a distributable installer.
 
-The first useful owner reply is: **Mac chip / RAM / macOS; spoken languages; streaming software or NDI receiver; transparent lower thirds yes/no; AI local or cloud.** API secrets belong in local server configuration, not chat or source control.
+Do not request the hardware/language/local-AI preferences again. Remaining external facts are the X32 expansion card, EasyWorship receiver operating system and actual inference/receiver results. API secrets, if an optional cloud provider is chosen later, belong in local configuration rather than chat.
