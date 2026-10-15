@@ -10,6 +10,7 @@ Each feature has its own branch. `main` preserves the baseline; `integration/web
 
 | Feature | Branch | Acceptance evidence |
 | --- | --- | --- |
+| Additional Bible translations | `feature/additional-bible-translations` | Downloaded public-domain ASV and YLT, validated full corpus counts/digests, search and displayed-translation switching |
 | Continuous local transcription | `feature/live-transcription` | Persistent Whisper HTTP process contract; partial text before Stop; final text committed on pause/window completion |
 | Automatic Scripture suggestions | `feature/automatic-scripture-detection` | Spoken references, corrections, ranges, follow-up verse numbers, quotations and fixture meaning matches; suggestion before Stop |
 | Optional automatic verse display | `feature/automatic-verse-presentation` | Final single-verse reference goes live while capture continues; defaults off |
@@ -34,7 +35,7 @@ These are planned branch names, not empty branches or completed features. Split 
 | Theme library and layout | `feature/theme-library` | Save/duplicate/import/export themes, reference positioning, richer lower thirds and motion controls |
 | Independent output channels | `feature/independent-outputs` | Separate content/layout per channel, synchronized controls and reconnection tests; current stream mirrors main |
 | Greek/Hebrew alignment | `feature/original-language-alignment` | Licensed verse/word alignment data, highlighted original-language display and speech-triggered study; current lexicon is dictionary lookup |
-| Translation/language packs | `feature/translation-packs` | Validated install/update/remove flow and licensed corpora; imported JSON is already supported |
+| Translation/language packs | `feature/translation-packs` | Validated install/update/remove flow and licensed corpora; BSB/ASV/YLT are bundled and imported JSON is supported. MSG/TPT still need authorized digital sources |
 | Audio routing controls | `feature/audio-routing` | Gain/input behavior, X32 channel routing, reconnect tests and supported system/NDI audio sources; microphone selection/meter already exist |
 | Remote/device operation | `feature/remote-control` | Defined OSC/remote actions, authenticated device connection, reconnect and concurrency behavior |
 | Hosted/multiple-device services | `feature/multi-device` | Explicit synchronization and access model with tests; no hosted backend or device administration currently exists |

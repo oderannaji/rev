@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ASV",
+    "name": "American Standard Version (1901)",
+    "sourceRepository": "scrollmapper/bible_databases",
+    "sourceRevision": "e1b254cef86d0e65b1a5d1a94b8b112d0f296a2c",
+    "retrieved": "2026-10-15",
+    "license": "Public Domain",
+    "sourceSha256": "602445e22c280a682ac4c489117ead179271f5ee50a78ee4531b249c71e7ce99",
+    "normalizedSha256": "5f6a7546659e48e4dfec7ff7a161a6b58e188adee536e2ec8b270197e631defd",
+    "books": 66,
+    "verseSlots": 31102,
+    "nonemptyVerses": 31086,
+    "emptySlotsOmitted": 16,
+    "conversion": "Flatten book/chapter containers; trim surrounding text whitespace; omit empty slots without renumbering. No verse text reworded."
+  },
+  {
+    "id": "YLT",
+    "name": "Young\u2019s Literal Translation (1898)",
+    "sourceRepository": "scrollmapper/bible_databases",
+    "sourceRevision": "e1b254cef86d0e65b1a5d1a94b8b112d0f296a2c",
+    "retrieved": "2026-10-15",
+    "license": "Public Domain",
+    "sourceSha256": "d55ef42dae715c4fc5d00049011b818a42a99e0ff419f5f08bc37cea0b4f12e3",
+    "normalizedSha256": "3d07b3d260ed942c0079a31693077e8570e8b1cd7401749b566ee5ad6ccec89e",
+    "books": 66,
+    "verseSlots": 31102,
+    "nonemptyVerses": 31102,
+    "emptySlotsOmitted": 0,
+    "conversion": "Flatten book/chapter containers; trim surrounding text whitespace; omit empty slots without renumbering. No verse text reworded."
+  }
+]
