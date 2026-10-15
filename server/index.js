@@ -1,3 +1,4 @@
+import {createNavigator} from './navigation.js';
 import http from 'node:http';
 import {createLocalConfig,createOllama} from './local-ai.js';
 import {createSemantic} from './semantic.js';
@@ -29,7 +30,7 @@ export async function createServer({root=projectRoot,dataDir=process.env.DATA_DI
  for(const file of await readdir(join(dataDir,'translations')))if(file.endsWith('.json')){try{const data=validateTranslation(JSON.parse(await readFile(join(dataDir,'translations',file),'utf8')));if(!engine.list().some(x=>x.id===data.id))engine.addTranslation(data);}catch{console.warn(`Ignored invalid local translation file: ${file}`);}}
  const localConfig=await createLocalConfig(dataDir),ollama=createOllamaOverride||createOllama();
  const semantic=createSemantic({dataDir,engine,config:localConfig,ollama}),speech=createSpeech({config:localConfig,...(speechExecute?{execute:speechExecute}:{})});
- const detector=createDetector({engine,semantic});
+ const detector=createDetector({engine,semantic}),navigate=createNavigator(engine);
  let state={};try{const loaded=JSON.parse(await readFile(join(dataDir,'state.json'),'utf8'));state=validateState(loaded);}catch(e){if(e.code!=='ENOENT')console.warn('Local state could not be loaded; starting with an empty state');}
  const listeners=new Set();let writeQueue=Promise.resolve();
  const broadcast=()=>{for(const response of listeners)response.write(`data: ${JSON.stringify(state)}\n\n`);};
@@ -77,6 +78,7 @@ export async function createServer({root=projectRoot,dataDir=process.env.DATA_DI
     const options={mode,translation:url.searchParams.get('translation')??'BSB',limit};
     return json(mode==='neural'?await semantic.search(url.searchParams.get('q'),options):engine.search(url.searchParams.get('q'),options));
    }
+   if(req.method==='GET'&&path==='/api/scripture/navigate'){const input=Object.fromEntries(url.searchParams);for(const key of ['chapter','verse','targetVerse'])if(input[key]!==undefined)input[key]=Number(input[key]);return json({verse:navigate(input)});}
    if(req.method==='GET'&&path==='/api/chapter')return json({results:engine.chapter(url.searchParams.get('book')??'',url.searchParams.get('chapter'),url.searchParams.get('translation')??'BSB')});
    if(req.method==='GET'&&path==='/api/state')return json(state);
    if(req.method==='PUT'&&path==='/api/state'){
