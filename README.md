@@ -2,19 +2,11 @@
 
 An independent local scripture and church-presentation studio, built after a static investigation of the Pewbeam installer you supplied. Its working local features are unrestricted. **Full Pewbeam feature parity is not complete**; see [coverage](docs/IMPLEMENTATION_STATUS.md).
 
-## Latest web feature build
+## Staging and updates
 
-Use branch `integration/web` to test the combined web changes; `main` preserves the earlier baseline. Each feature has a separate branch, listed with evidence and remaining work in [the web roadmap](docs/REMAINING_WORK.md). From the existing checkout:
+Use `staging` for the combined pre-production build. Work stays in one repository, with each feature on its own `feature/...` branch. Accepted changes merge into staging; a separate release PR promotes staging to `main`. See [the branch workflow](docs/BRANCH_WORKFLOW.md).
 
-```bash
-git fetch origin
-git switch integration/web
-git pull --ff-only
-npm run build
-npm start
-```
-
-Stop an older app server before restarting. Keep your existing data and models. The Mac desktop installer is deferred while the localhost workflow is completed.
+After cloning once, stop the running app and use `npm run update:staging` to fetch, build and restart it. Existing data and models are preserved. Repeated ZIP downloads are unnecessary. `integration/web` remains as the earlier integration branch; new work targets staging. Mac desktop packaging remains deferred.
 
 ## Start
 
