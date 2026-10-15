@@ -1,12 +1,15 @@
 import React,{useEffect,useRef,useState} from 'react';
 import {Mic,Upload,RefreshCw} from 'lucide-react';
 import {captureMicrophone,audioFile} from './audio.js';
-export default function OfflineSpeech({onText,onPartial=()=>{},fail}){
+export default function OfflineSpeech({onText,onPartial=()=>{},fail,onCaptureState,stopSignal=0}){
   const [status,setStatus]=useState(null),[recording,setRecording]=useState(false),[pending,setPending]=useState(0),[starting,setStarting]=useState(false),[message,setMessage]=useState('');
   const [testing,setTesting]=useState(false),[devices,setDevices]=useState([]),[deviceId,setDeviceId]=useState(''),[level,setLevel]=useState(0),[heard,setHeard]=useState(false);
   const [captureMode,setCaptureMode]=useState('live'),[partial,setPartial]=useState('');
   const partialCallback=useRef(onPartial);partialCallback.current=onPartial;
   const stopRef=useRef(),queue=useRef([]),working=useRef(false),active=useRef(true),callback=useRef(onText),file=useRef();callback.current=onText;
+  const previousStop=useRef(stopSignal);
+  useEffect(()=>{onCaptureState?.({recording,testing,starting,pending});},[recording,testing,starting,pending,onCaptureState]);
+  useEffect(()=>{if(previousStop.current===stopSignal)return;previousStop.current=stopSignal;setRecording(false);setTesting(false);void stopRef.current?.();},[stopSignal]);
   const refreshStatus=async()=>{try{const r=await fetch('/api/speech/status');if(!r.ok)throw Error('Could not check local Whisper.');const s=await r.json();if(active.current)setStatus(s);}catch(e){if(active.current)fail(e);}};
   const refreshDevices=async()=>{try{const inputs=(await navigator.mediaDevices?.enumerateDevices()||[]).filter(d=>d.kind==='audioinput');if(active.current){setDevices(inputs);setDeviceId(current=>inputs.some(d=>d.deviceId===current)?current:'');}}catch(e){if(active.current)fail(e);}};
   useEffect(()=>{active.current=true;refreshStatus();refreshDevices();navigator.mediaDevices?.addEventListener('devicechange',refreshDevices);return()=>{active.current=false;queue.current=[];navigator.mediaDevices?.removeEventListener('devicechange',refreshDevices);void stopRef.current?.(false);};},[]);

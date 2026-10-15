@@ -130,3 +130,22 @@ test('spoken slides are suggested during speech and auto-display is exclusive wi
   await page.getByRole('button',{name:'Stop recording'}).click();
   await expect(page.locator('.live-section .projection-reference')).toContainText('Our welcome');
 });
+test('live listening survives tool navigation and can be stopped outside Transcripts',async({page,context})=>{
+  await context.grantPermissions(['microphone']);
+  await page.route('**/api/speech/status',route=>route.fulfill({json:{available:true,liveAvailable:true}}));
+  await page.route('**/api/speech/prepare',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/speech/transcribe',route=>route.fulfill({json:{text:'We read John chapter three verse sixteen.',inferenceMs:100}}));
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await page.getByLabel('Auto-show confirmed single-verse references').check();
+  await page.getByRole('button',{name:'Start live listening'}).click();
+  await expect(page.getByLabel('Live transcript draft')).toContainText('John chapter three');
+  await page.getByRole('button',{name:'Slides',exact:true}).click();
+  await expect(page.getByLabel('Slide title')).toBeVisible();
+  await expect(page.getByRole('button',{name:'Stop listening',exact:true})).toBeEnabled();
+  await expect(page.locator('.live-section .projection-reference')).toContainText('John 3:16',{timeout:18000});
+  await page.getByRole('button',{name:'Stop listening',exact:true}).click();
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await expect(page.getByLabel('Transcript text')).toContainText('John chapter three');
+  await expect(page.getByRole('button',{name:'Start live listening'})).toBeEnabled();
+  await expect(page.getByLabel('Auto-show confirmed single-verse references')).toBeChecked();
+});
