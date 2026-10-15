@@ -160,6 +160,8 @@ test('Scripture navigation changes the displayed verse and accepts spoken verse 
   await page.route('**/api/speech/status',route=>route.fulfill({json:{available:true,liveAvailable:true}}));
   await page.route('**/api/speech/prepare',route=>route.fulfill({json:{ready:true}}));
   await page.route('**/api/speech/transcribe',route=>route.fulfill({json:{text:'Shepherd go to verse eleven.',inferenceMs:100}}));
+  let detectionRequests=0;
+  await page.route('**/api/scripture/detect',route=>{detectionRequests++;return route.fulfill({json:{results:[],kind:'none'}});});
   await page.getByRole('button',{name:'Transcripts',exact:true}).click();
   await page.getByLabel('Enable voice commands for this session').check();
   await page.getByRole('button',{name:'Start live listening'}).click();
@@ -167,6 +169,7 @@ test('Scripture navigation changes the displayed verse and accepts spoken verse 
   await expect(page.locator('.live-section .projection-reference')).toContainText('John 2:1');
   await page.getByRole('button',{name:'Stop recording'}).click();
   await expect(page.locator('.live-section .projection-reference')).toContainText('John 2:11');
+  expect(detectionRequests).toBe(0);
   await page.setViewportSize({width:390,height:844});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

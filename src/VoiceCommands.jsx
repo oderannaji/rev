@@ -2,8 +2,8 @@ import {matchScriptureCommand} from '../shared/scripture-commands.js';
 import React, {useEffect, useRef, useState} from 'react';
 import {commandActions, defaultCommands, matchCommand, validateCommands} from '../shared/voice-commands.js';
 
-export default function VoiceCommands({utterance, commands = defaultCommands, save, execute, translations, navigateScripture}) {
-  const [enabled, setEnabled] = useState(false), [draft, setDraft] = useState(commands), [message, setMessage] = useState('');
+export default function VoiceCommands({utterance, commands = defaultCommands, save, execute, translations, navigateScripture, enabled, setEnabled}) {
+  const [draft, setDraft] = useState(commands), [message, setMessage] = useState('');
   const last = useRef(null), executeRef = useRef(execute), navigateRef=useRef(navigateScripture); executeRef.current = execute; navigateRef.current=navigateScripture;
   useEffect(() => {setDraft(commands);}, [commands]);
   useEffect(() => {
