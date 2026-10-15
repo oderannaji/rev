@@ -36,7 +36,7 @@ Search a reference, phrase, or topic. Select a result to preview it, then **Take
 
 The sidebar contains slide authoring/document import, a local media library, themes, transcripts, a Greek/Hebrew dictionary, and Content Studio. Topic mode uses explicit synonym expansion. Context mode uses a locally built neural index through Ollama. Transcription uses local whisper.cpp after configuration, with browser microphone capture or short audio-file imports. No browser cloud speech service is used.
 
-The included BSB corpus contains 31,086 nonempty verses. Sixteen blank source slots are omitted. Other translations can be imported in Settings using the documented JSON schema. Source and licensing details: [THIRD_PARTY.md](docs/THIRD_PARTY.md).
+The bundled library includes BSB (31,086 nonempty verses), ASV (31,086) and Young’s Literal Translation / YLT (31,102). Select them using the Bible translation dropdown; reference, phrase and live-output switching work offline. Neural search requires a separate index for each translation. The original BSB corpus contains 31,086 nonempty verses. Sixteen blank source slots are omitted. Other translations can be imported in Settings using the documented JSON schema. Source and licensing details: [THIRD_PARTY.md](docs/THIRD_PARTY.md).
 
 ## First microphone test
 

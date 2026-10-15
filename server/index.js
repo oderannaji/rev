@@ -25,7 +25,7 @@ async function atomic(path,value){const temp=`${path}.${randomUUID()}.tmp`;await
 async function body(req,max=10*1024*1024){const parts=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>max)throw fail('Request is too large',413);parts.push(chunk);}try{return JSON.parse(Buffer.concat(parts).toString('utf8'));}catch{throw fail('Invalid JSON body');}}
 export async function createServer({root=projectRoot,dataDir=process.env.DATA_DIR||join(root,'.local'),translations,ollama:createOllamaOverride,speechExecute}={}){
  await mkdir(join(dataDir,'translations'),{recursive:true});await mkdir(join(dataDir,'media'),{recursive:true});
- if(!translations)translations=[JSON.parse(await readFile(join(root,'data','BSB.json'),'utf8'))];
+ if(!translations)translations=await Promise.all(['BSB','ASV','YLT'].map(async id=>JSON.parse(await readFile(join(root,'data',`${id}.json`),'utf8'))));
  const engine=createSearchEngine(translations.map(validateTranslation));
  for(const file of await readdir(join(dataDir,'translations')))if(file.endsWith('.json')){try{const data=validateTranslation(JSON.parse(await readFile(join(dataDir,'translations',file),'utf8')));if(!engine.list().some(x=>x.id===data.id))engine.addTranslation(data);}catch{console.warn(`Ignored invalid local translation file: ${file}`);}}
  const localConfig=await createLocalConfig(dataDir),ollama=createOllamaOverride||createOllama();

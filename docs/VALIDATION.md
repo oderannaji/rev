@@ -67,3 +67,9 @@ No real Whisper, EmbeddingGemma or Qwen model ran in this cloud environment. M5 
 Explicit command priority was verified by the spoken verse-jump scenario: no automatic detection request was made for the recognized command phrase. Both the queue-command and Scripture-command browser scenarios passed after sharing the session enable state.
 
 The integrated server was restarted on port 4173. Health identity, John 3:16 reference retrieval, navigation to verse 17 and automatic detection of a spoken John 3:16 reference all passed against the running backend. The updated Mac setup script passed Bash syntax checking; no Mac execution is implied. The reusable environment `start_skill` was updated to Shepherd Pro/current branches and saved as a draft; publication is separate.
+
+## Additional translations — 15 October 2026
+
+Downloaded ASV and YLT plus explicit public-domain notices from a pinned Scrollmapper revision. A new corpus/API test verifies normalized hashes, valid unique verse references, 66 books, opening/closing book coverage, translation discovery, John 3:16 search and swapping the displayed translation. It and three existing server tests passed (4 total). The browser check switches search to ASV, presents John 3:16 and switches the live verse to YLT. No model installation, original-app extraction or unrelated full-suite run was repeated. No frontend source changed, so the retained production bundle is reused.
+
+MSG/TPT publisher permissions pages and API.Bible were blocked by proxy 403. No publisher agreement or authorized offline text was established and neither requested copyrighted edition was downloaded. A WEB mirror was inspected but not bundled; its book naming/text formatting was unsuitable for direct import. The user’s app now has actual ASV/YLT data, not placeholder entries.

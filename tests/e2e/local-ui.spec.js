@@ -2,6 +2,16 @@ import {test,expect} from '@playwright/test';
 import {validateWav} from '../../server/speech.js';
 
 test.beforeEach(async({request,page})=>{await request.put('/api/state',{data:{}});await page.goto('/');await expect(page.getByLabel('Preview John 3:16',{exact:true})).toBeVisible();});
+test('additional translations can be searched and switched on live output',async({page})=>{
+  await page.getByLabel('Bible translation').selectOption('ASV');
+  const verse=page.getByLabel('Preview John 3:16',{exact:true});
+  await expect(verse).toContainText('only begotten Son');
+  await verse.click();await page.getByRole('button',{name:'Take live',exact:true}).click();
+  await expect(page.locator('.live-section .projection-reference')).toContainText('ASV');
+  await page.getByLabel('Displayed translation').selectOption('YLT');
+  await expect(page.locator('.live-section .projection-reference')).toContainText('YLT');
+  await expect(page.locator('.live-section .projection-text')).toContainText('God did so love');
+});
 test('transparent OBS overlay clears and blacks out without covering the camera',async({page,context})=>{
   const output=await context.newPage();await output.goto('/output?channel=lowerthird');
   await expect(output.locator('html')).toHaveCSS('background-color','rgba(0, 0, 0, 0)');
