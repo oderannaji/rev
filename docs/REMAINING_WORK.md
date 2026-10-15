@@ -6,7 +6,7 @@ The owner has run both Mac setup commands and reports that the app looks good. H
 
 ## Published feature branches
 
-Each feature has its own branch. `main` preserves the baseline; `integration/web` combines the tested features below for localhost testing. These are implemented and tested with synthetic audio/fixture speech, **not certified real-model or full Pewbeam parity**.
+Each feature has its own branch. `main` preserves the baseline; `staging` now combines the tested features below for localhost testing; `integration/web` is retained as the previous integration branch. See [Git workflow](BRANCH_WORKFLOW.md). These are implemented and tested with synthetic audio/fixture speech, **not certified real-model or full Pewbeam parity**.
 
 | Feature | Branch | Acceptance evidence |
 | --- | --- | --- |
@@ -53,7 +53,7 @@ Current speech is repeated inference on growing audio windows, with drafts about
 
 ## Test the integrated web build
 
-From your existing repository folder, fetch and switch to `integration/web`, build with `npm run build`, then restart `npm start`. Keep existing `.local` data and model installations. In Transcripts choose continuous mode, start listening and speak “Today we read John chapter three, verse sixteen.” Expect a draft and Scripture suggestion before pressing Stop. Pause and check the committed transcript. Try switching to Slides while listening and stopping with the shared control.
+From your existing repository folder, use `staging` and the [one-time Git setup](BRANCH_WORKFLOW.md). Later stop the app and run `npm run update:staging` to fetch, build and restart. Keep existing `.local` data and model installations. In Transcripts choose continuous mode, start listening and speak “Today we read John chapter three, verse sixteen.” Expect a draft and Scripture suggestion before pressing Stop. Pause and check the committed transcript. Try switching to Slides while listening and stopping with the shared control.
 
 If live mode specifically reports missing `whisper-server`, the updated speech-only script builds that additional executable beside `whisper-cli` and reuses the installed model. Do not repeat full model setup simply to update the web app.
 
