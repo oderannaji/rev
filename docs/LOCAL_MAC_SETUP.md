@@ -1,6 +1,8 @@
 # Local setup for your M5 Mac with 16 GB RAM
 
-Target supplied by the owner: M5, 16 GB RAM, macOS Tahoe 26.4, English speech (Nigerian English in services), Behringer X32 mixer, OBS and EasyWorship 8.0.49. The EasyWorship receiver OS and X32 expansion card are still unconfirmed. Compatibility and performance on this Mac have not yet been tested. This setup script has been syntax-checked in Linux, not executed on a Mac.
+Target supplied by the owner: M5, 16 GB RAM, macOS Tahoe 26.4, English speech (Nigerian English in services), Behringer X32 mixer, OBS and EasyWorship 8.0.49. The EasyWorship receiver OS and X32 expansion card are still unconfirmed. Compatibility and performance on this Mac have not yet been tested. The owner reports running both setup commands on the Mac; this workspace has only syntax-checked the script and has not inspected the Mac results.
+
+The owner has already run both setup commands. Reuse installed models. The current priority is the localhost web app; desktop packaging is deferred. Only run setup again if a required component is missing. Live mode now needs `whisper-server` beside the existing `whisper-cli`; the updated speech-only script builds it without downloading existing models again.
 
 ## First test: speak directly to the Mac
 
@@ -16,10 +18,10 @@ You do not need the X32 for this test.
 
    This installs missing CMake/Whisper components and the speech model; it skips Ollama, EmbeddingGemma and Qwen. Homebrew and Apple's Command Line Tools are prerequisites as below. Existing files are reused.
 4. In **Settings → Local AI**, enable local AI, paste the two Whisper paths printed by the script, and save. An Ollama-unavailable message is expected with speech-only setup; it does not prevent Whisper transcription.
-5. Return to **Transcripts** and click **Refresh audio setup** if needed. Click **Use offline microphone** and say: “Today we are reading John chapter three, verse sixteen.” Click **Stop recording** to submit the final captured section. Wait for the local result and review the text. A level meter alone is not proof of transcription success.
-6. Choose **Find related Scripture** separately. The current app does not automatically take detected verses live. Topic expansion works without a neural index; choose Context only after installing the search model and building its index.
+5. Return to **Transcripts** and click **Refresh audio setup** if needed. Choose **Continuous live transcription**, click **Start live listening**, and say: “Today we are reading John chapter three, verse sixteen.” Keep speaking and watch the draft and automatic Scripture suggestions. Pause to finalize a phrase; **Stop recording** finishes the last captured phrase. Review the text. A level meter alone is not proof of transcription success.
+6. Automatic detection is enabled by default. Explicit references and quotations work without a neural index; meaning matches need a built index. Optional **Auto-show confirmed single-verse references** presents finalized single-verse references. It is off by default. **Find related Scripture** remains a separate search for edited/pasted notes.
 
-Later, run the script without `--speech-only` to install the remaining local models. It reuses the Whisper installation.
+If you have only installed speech and now want search/drafting, run the full script once. If you already ran both commands, keep those installations.
 
 ## Selected starting models
 
@@ -56,7 +58,8 @@ If an Ollama instance is already running, configure its cloud setting separately
 - **Scripture → Context:** try paraphrases and review the suggested verses. Reference, Smart, Phrase and Topic modes still work without models. Topic remains synonym expansion; Context is the neural mode.
 - **Content → Draft with AI:** the UI must say it runs locally with your model. Try a short set of your own notes first. Do not use generated quotes without checking the Bible text.
 - **Transcripts:** use the offline microphone or import a browser-decodable audio file lasting 0.5–120 seconds. Audio is converted to mono 16 kHz PCM WAV and sent only to this app's local server. Temporary WAV and result files are removed after transcription. Save the reviewed transcript explicitly.
-- Live microphone capture processes 20-second sections, so it is delayed transcription, not word-by-word streaming. If inference falls behind, capture pauses to finish the queued sections. Section boundaries can split a phrase. Suggested verses are operator-triggered and never automatically taken live.
+- Continuous capture sends growing phrase snapshots roughly every two seconds, plus inference delay, and finalizes on pauses or at 12 seconds. It keeps Whisper loaded and updates suggestions while recording. This is windowed inference, not token streaming; boundary errors and real latency remain unmeasured. A separate legacy 20-second mode remains available. If inference falls behind, capture pauses to finish queued audio. See [live transcription](LIVE_TRANSCRIPTION.md).
+- Listening continues when switching app tools. The shared **Stop listening** control finishes capture from any tool. Optional [voice commands](VOICE_COMMANDS.md), [Scripture navigation](SCRIPTURE_NAVIGATION.md) and [slide matching](SPEECH_SLIDE_MATCHING.md) are available in Transcripts.
 - Perform a brief offline check after models and index are installed: disconnect internet, search a paraphrase, transcribe a recording and generate a short draft. OBS and the app need to remain running. NDI needs the local network even when internet is disconnected.
 
 To evaluate Nigerian English, start with two or three minutes of speech you have permission to use, split into clips of at most two minutes. Include normal sermon delivery, names, spoken Bible references and your usual microphone/mixer. Compare the transcript with a manually corrected version; measure transcription delay and any wrong scripture references. We have not performed this accuracy or M5 memory/latency evaluation yet.
