@@ -113,3 +113,20 @@ test('voice control waits for a completed phrase and does not replay commands wh
   await page.getByRole('button',{name:'Save command phrases'}).click();
   await expect.poll(async()=> (await (await request.get('/api/state')).json()).voiceCommands?.next).toBe('move forward');
 });
+test('spoken slides are suggested during speech and auto-display is exclusive with Scripture',async({page,context,request})=>{
+  await context.grantPermissions(['microphone']);
+  const text='Today we welcome every family to worship with us together.';
+  await request.put('/api/state',{data:{slides:[{id:'welcome-slide',title:'Our welcome',text}]}});
+  await page.route('**/api/speech/status',route=>route.fulfill({json:{available:true,liveAvailable:true}}));
+  await page.route('**/api/speech/prepare',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/speech/transcribe',route=>route.fulfill({json:{text,inferenceMs:100}}));
+  await page.getByRole('button',{name:'Transcripts',exact:true}).click();
+  await page.getByLabel('Auto-show confirmed single-verse references').check();
+  await page.getByLabel('Auto-show a unique strong slide match').check();
+  await expect(page.getByLabel('Auto-show confirmed single-verse references')).not.toBeChecked();
+  await page.getByRole('button',{name:'Start live listening'}).click();
+  await expect(page.getByRole('button',{name:'Preview matched slide Our welcome',exact:true})).toBeVisible();
+  await expect(page.locator('.live-section .projection-reference')).toHaveCount(0);
+  await page.getByRole('button',{name:'Stop recording'}).click();
+  await expect(page.locator('.live-section .projection-reference')).toContainText('Our welcome');
+});
